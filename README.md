@@ -158,7 +158,7 @@ Example for US premium-rate:
 
 ## Updates
 
-Data is extracted weekly from the latest [libphonenumber release](https://github.com/google/libphonenumber/releases) (~every 2 weeks) via GitHub Actions. Only metadata changes trigger a new npm publish.
+Data is extracted weekly from the latest [libphonenumber release](https://github.com/google/libphonenumber/releases) (~every 2 weeks) via GitHub Actions. Only metadata changes trigger a new commit.
 
 ## Building from Source
 

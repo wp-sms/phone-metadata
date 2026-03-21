@@ -108,18 +108,11 @@ function parseLengthSpec(value) {
 }
 
 function collectFallbackLengths(territory, attributeName) {
-  const lengths = new Set();
-
-  for (const typeKey of NUMBER_TYPE_KEYS) {
-    const typeNode = territory[typeKey];
-    const spec = typeNode?.possibleLengths?.[`@_${attributeName}`];
-
-    for (const length of parseLengthSpec(spec)) {
-      lengths.add(length);
-    }
-  }
-
-  return [...lengths].sort((a, b) => a - b);
+  const all = NUMBER_TYPE_KEYS.flatMap(typeKey => {
+    const spec = territory[typeKey]?.possibleLengths?.[`@_${attributeName}`];
+    return parseLengthSpec(spec);
+  });
+  return [...new Set(all)].sort((a, b) => a - b);
 }
 
 function resolveNumberLengths(territory) {
@@ -204,17 +197,19 @@ function extractTerritoryData(territory) {
   };
 }
 
-function validateOutput(output, jsonString, sizeBytes) {
+function validateOutput(output, sizeBytes) {
   const territoryCount = Object.keys(output.territories).length + Object.keys(output.non_geographic).length;
   if (territoryCount < 200) {
     throw new Error(`Validation failed: expected at least 200 total entries, found ${territoryCount}.`);
   }
 
-  JSON.parse(jsonString);
-
-  const premiumRateCount = [...Object.values(output.territories), ...Object.values(output.non_geographic)].filter(
-    (territory) => territory.patterns.premium_rate !== null,
-  ).length;
+  let premiumRateCount = 0;
+  for (const t of Object.values(output.territories)) {
+    if (t.patterns.premium_rate !== null) premiumRateCount++;
+  }
+  for (const t of Object.values(output.non_geographic)) {
+    if (t.patterns.premium_rate !== null) premiumRateCount++;
+  }
 
   if (premiumRateCount < 30) {
     throw new Error(
@@ -222,14 +217,12 @@ function validateOutput(output, jsonString, sizeBytes) {
     );
   }
 
+  const sizeKB = (sizeBytes / 1024).toFixed(1);
   if (sizeBytes > 1024 * 1024) {
-    throw new Error(
-      `Validation failed: phone-metadata.json is ${(sizeBytes / 1024).toFixed(1)} KB, which exceeds 1024 KB.`,
-    );
+    throw new Error(`Validation failed: phone-metadata.json is ${sizeKB} KB, which exceeds 1024 KB.`);
   }
-
   if (sizeBytes > 500 * 1024) {
-    console.error(`Warning: phone-metadata.json is ${(sizeBytes / 1024).toFixed(1)} KB.`);
+    console.error(`Warning: phone-metadata.json is ${sizeKB} KB.`);
   }
 
   for (const territoryKey of Object.keys(output.territories)) {
@@ -274,11 +267,10 @@ async function main() {
 
   for (const territory of territories) {
     const id = territory['@_id'];
-    const countryCode = String(territory['@_countryCode']);
     const data = extractTerritoryData(territory);
 
     if (id === '001' && (idCounts[id] ?? 0) > 1) {
-      nonGeographicEntries.push([countryCode, data]);
+      nonGeographicEntries.push([data.country_code, data]);
       continue;
     }
 
@@ -287,11 +279,7 @@ async function main() {
 
   const now = new Date();
   const output = {
-    version: [
-      now.getFullYear(),
-      String(now.getMonth() + 1).padStart(2, '0'),
-      String(now.getDate()).padStart(2, '0'),
-    ].join('.'),
+    version: now.toISOString().slice(0, 10).replaceAll('-', '.'),
     source: 'libphonenumber',
     generated_at: now.toISOString(),
     territories: Object.fromEntries(
@@ -306,7 +294,7 @@ async function main() {
   const jsonString = `${JSON.stringify(output, null, 2)}\n`;
   const sizeBytes = Buffer.byteLength(jsonString, 'utf8');
 
-  validateOutput(output, jsonString, sizeBytes);
+  validateOutput(output, sizeBytes);
 
   console.error(
     `Extracted ${Object.keys(output.territories).length} territories and ${Object.keys(output.non_geographic).length} non-geographic entries`,
