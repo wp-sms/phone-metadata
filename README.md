@@ -11,19 +11,14 @@ Auto-updated weekly. Served via [jsDelivr CDN](https://www.jsdelivr.com/). No AP
 ### CDN (recommended)
 
 ```
-https://cdn.jsdelivr.net/npm/phone-metadata/phone-metadata.json
-```
-
-### npm
-
-```bash
-npm install phone-metadata
+https://cdn.jsdelivr.net/gh/wp-sms/phone-metadata@master/phone-metadata.json
 ```
 
 ### Direct download
 
 ```bash
-curl -sL -o phone-metadata.json https://cdn.jsdelivr.net/npm/phone-metadata/phone-metadata.json
+curl -sL -o phone-metadata.json \
+  https://cdn.jsdelivr.net/gh/wp-sms/phone-metadata@master/phone-metadata.json
 ```
 
 ## Usage
@@ -31,7 +26,7 @@ curl -sL -o phone-metadata.json https://cdn.jsdelivr.net/npm/phone-metadata/phon
 ### Node.js
 
 ```js
-import metadata from 'phone-metadata' with { type: 'json' };
+const metadata = JSON.parse(fs.readFileSync('phone-metadata.json', 'utf8'));
 
 // Get US premium-rate pattern
 const usPatterns = metadata.territories.US.patterns;
