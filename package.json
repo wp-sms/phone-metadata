@@ -2,7 +2,7 @@
   "name": "phone-metadata",
   "version": "1.0.0",
   "description": "Phone number metadata from libphonenumber. Country codes, number types, premium-rate patterns. Auto-updated via jsDelivr CDN.",
-  "private": true,
+  "main": "phone-metadata.json",
   "scripts": {
     "build": "node build/extract.mjs PhoneNumberMetadata.xml",
     "download": "curl -sL -o PhoneNumberMetadata.xml https://raw.githubusercontent.com/google/libphonenumber/master/resources/PhoneNumberMetadata.xml",
@@ -12,8 +12,21 @@
     "type": "git",
     "url": "https://github.com/wp-sms/phone-metadata"
   },
+  "keywords": [
+    "phone",
+    "sms",
+    "libphonenumber",
+    "metadata",
+    "country-codes",
+    "premium-rate",
+    "phone-number",
+    "validation"
+  ],
   "author": "VeronaLabs",
   "license": "Apache-2.0",
+  "files": [
+    "phone-metadata.json"
+  ],
   "devDependencies": {
     "fast-xml-parser": "^4.5.0"
   }
