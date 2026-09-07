@@ -1,7 +1,7 @@
 {
-  "version": "2026.08.31",
+  "version": "2026.09.07",
   "source": "libphonenumber",
-  "generated_at": "2026-08-31T12:13:14.080Z",
+  "generated_at": "2026-09-07T11:05:53.194Z",
   "territories": {
     "AC": {
       "country_code": "247",
